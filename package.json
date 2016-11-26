@@ -1,0 +1,22 @@
+{
+  "name": "bakule",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "react-scripts": "0.7.0"
+  },
+  "dependencies": {
+    "d3": "^4.4.0",
+    "react": "^15.4.1",
+    "react-d3-basic": "^1.6.11",
+    "react-d3-library": "^1.1.7",
+    "react-dom": "^15.4.1",
+    "react-native": "^0.38.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
