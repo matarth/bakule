@@ -1,5 +1,17 @@
 var d3 = require('d3');
+var Uzel = require('./Classes/Uzel');
+var Board = require('./Classes/Board');
+
 var node = document.createElement('div');
+
+var board = new Board();
+var uzel1 = new Uzel('Mata');
+var uzel2 = new Uzel('Ivet');
+
+board.addNode(uzel1);
+board.addNode(uzel2);
+
+board.generateHtmlNodes();
 
 var width = 100,
     height = 100;
