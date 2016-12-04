@@ -1,41 +1,40 @@
 var d3 = require('d3');
-var Uzel = require('./Classes/Uzel');
-var Board = require('./Classes/Board');
+import Controller from "./ClassesJs/Controller";
+
+var controller = new Controller();
+
 
 var node = document.createElement('div');
+// var svg = d3.select(node).append("svg")
+//     .attr("width", 500)
+//     .attr("height", 500);
+// var width = 100,
+//     height = 100;
+//
+// var createCircle = function(x, y, r){
+//     //var svg = d3.select(node).a}ppend("svg")
+//
+//     svg.append("circle")
+//         .attr("cx", x)
+//         .attr("cy", y)
+//         .attr("r", r)
+//         .attr("fill", "red");
+//
+// }
+//
+// var alpha = 0;
+// var step = (Math.PI*2)/10;
+// var ii = 0;
+// for(ii = 0; ii < 10; ii++){
+//
+//     var x = Math.cos(alpha);
+//     var y = Math.sin(alpha);
+//
+//     createCircle(50 + 30*x,50 + 30*y,5);
+//     alpha += step;
+// }
+//
+//
 
-var board = new Board();
-var uzel1 = new Uzel('Mata');
-var uzel2 = new Uzel('Ivet');
-
-board.addNode(uzel1);
-board.addNode(uzel2);
-
-board.generateHtmlNodes();
-
-var width = 100,
-    height = 100;
-
-var svg = d3.select(node).append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-svg.append("rect")
-    .attr("x", 35)
-    .attr("y", 20)
-    .attr("height", 100)
-    .attr("width", 100);
 
 module.exports = node;
-
-/*
-import d3 from 'd3';
-var node = document.createElement('p');
-
-d3.select('App').append('p').text("Halo!")
-
-var width = 960,
-    height = 500;
-
-module.exports = node
-*/
