@@ -1,10 +1,11 @@
 var d3 = require('d3');
-import Controller from "./ClassesJs/Controller";
-
-var controller = new Controller();
-
+import Controller from "./ClassesJs/Controller/Controller";
 
 var node = document.createElement('div');
+var controller = new Controller(d3, node);
+
+
+
 // var svg = d3.select(node).append("svg")
 //     .attr("width", 500)
 //     .attr("height", 500);
