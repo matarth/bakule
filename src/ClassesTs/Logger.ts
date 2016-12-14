@@ -7,4 +7,16 @@ export default class Logger{
         console.log(message);
     }
 
+    static logAllProperties(object: any){
+        for(var key in object){
+            this.log(key + " - " + object[key]);
+        }
+    }
+
+    static logAllPropertyNames(object: any){
+        for(var key in object){
+            this.log(key);
+        }
+    }
+
 }
