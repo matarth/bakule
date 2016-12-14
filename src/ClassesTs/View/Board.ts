@@ -7,35 +7,6 @@ import Node from './Node';
 import Link from './Link';
 
 
-var nodeArray:any = [
-    {"index": 1, "name": "server 1"},
-    {"index": 2, "name": "server 2"},
-    {"index": 3, "name": "server 3"},
-    {"index": 4, "name": "server 4"},
-    {"index": 5, "name": "server 5"},
-    {"index": 6, "name": "server 6"},
-    {"index": 7, "name": "server 7"},
-    {"index": 8, "name": "server 8"},
-    {"index": 9, "name": "server 9"}
-];
-
-var linkArray:any = [
-    {source: 1, target: 2},
-    {source: 1, target: 3},
-    {source: 1, target: 4},
-    {source: 2, target: 5},
-    {source: 2, target: 6},
-    {source: 3, target: 7},
-    {source: 5, target: 8},
-    {source: 6, target: 8},
-];
-
-
-var nodeElement;
-var linkElement;
-var simulation;
-
-
 export default class Board {
 
     private d3:any;
@@ -46,14 +17,19 @@ export default class Board {
     private height:number = 720;
 
 
+    private nodeElement;
+    private linkElement;
+    private simulation;
+
+    private nodeArray;
+    private linkArray;
+
     constructor(d3:any, node:any) {
 
         MyLogger.log("Board Constructor");
 
         this.d3 = d3;
         this.HTMLnode = node;
-
-        //this.drawCircle();
 
         var n1, n2, n3:Node;
 
@@ -68,13 +44,13 @@ export default class Board {
         this.linkSet.add(new Link(n1, n3));
 
 
-        this.drawByExample();
+        this.drawByApi();
     }
 
     private drawByApi() {
 
 
-        var nodeArray:any = [
+        this.nodeArray= [
             {"index": 1, "name": "server 1"},
             {"index": 2, "name": "server 2"},
             {"index": 3, "name": "server 3"},
@@ -86,7 +62,7 @@ export default class Board {
             {"index": 9, "name": "server 9"}
         ];
 
-        var linkArray:any = [
+         this.linkArray = [
             {source: 1, target: 2},
             {source: 1, target: 3},
             {source: 1, target: 4},
@@ -113,52 +89,48 @@ export default class Board {
             .attr('width', this.width)
             .attr('height', this.height);
 
-        simulation = this.d3.forceSimulation()
+        this.simulation = this.d3.forceSimulation()
             .force("link", this.d3.forceLink().id(function (d) {
                 return (d.index);
             }));
 
 
-        nodeElement = svg.selectAll(".node")
-            .data(nodeArray);
+        this.nodeElement = svg.selectAll(".node")
+            .data(this.nodeArray);
 
-        linkElement = svg.selectAll(".link")
-            .data(linkArray);
+        this.linkElement = svg.selectAll(".link")
+            .data(this.linkArray);
 
 
-        update();
+        this.update();
+    }
+        private update() {
 
-        function update() {
-
-            linkElement = linkElement.enter()
+            this.linkElement = this.linkElement.enter()
                 .append("line")
                 .attr("class", "link");
 
-            nodeElement = nodeElement.enter()
+            this.nodeElement = this.nodeElement.enter()
                 .append("g")
                 .attr("class", "node");
 
-            nodeElement.append("circle")
+            this.nodeElement.append("circle")
                 .attr("r", 20);
 
-            MyLogger.logAllPropertyNames(nodeElement);
+            this.simulation.nodes(this.nodeArray).on("tick", ticked(this.nodeElement));
+            this.simulation.force("link").links(this.linkArray);
 
-            simulation.nodes(nodeArray).on("tick", ticked);
-            simulation.force("link").links(linkArray);
+            function ticked(nodeElement: any){
+
+                // MyLogger.log("-------------");
+                // MyLogger.logAllPropertyNames(nodeElement);
+
+                nodeElement.attr("transform", function(d){
+                    return("translate(" + d.x + ", " + d.y + ")");
+                });
+            }
 
         }
-
-    function ticked() {
-            //MyLogger.log("tickedd " + nodeElement);
-       //     MyLogger.logAllPropertyNames(nodeElement);
-       //     MyLogger.log("--------");
-            nodeElement.enter().attr("transform", function(d){
-                return("translate(" + d.x + ", " + d.y + ")");
-            });
-        }
-
-    }
-
 
     private drawByExample(){
         var nodes = [
@@ -215,8 +187,8 @@ export default class Board {
             node = node.enter()
                 .append("g")
                 .attr("class", "node")
-                .on("click", click);
-
+                .on("click", click)
+                .attr("testAttribute", "update");
 
             node.append("circle")
                 .attr("r", 2.5)
@@ -234,6 +206,9 @@ export default class Board {
 
             simulation.force("link")
                 .links(links);
+
+            this.d3.select(node).attr("testAttribute", "node - end")
+            MyLogger.log("node - end");
         }
 
         function click(d) {
@@ -250,8 +225,8 @@ export default class Board {
                 .attr("x2", function(d) { return d.target.x; })
                 .attr("y2", function(d) { return d.target.y; });
 
-            node
-                .attr("transform", function(d) { return "translate(" + d.x + ", " + d.y + ")"; });
+            node.exit().attr("testAttribute", "tick");
+            MyLogger.log("ticked");
         }
 
         function dragstarted(d) {
