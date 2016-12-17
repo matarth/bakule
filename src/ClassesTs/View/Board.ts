@@ -50,27 +50,27 @@ export default class Board {
     private drawByApi() {
 
 
-        this.nodeArray= [
-            {"index": 1, "name": "server 1"},
+        this.nodeArray = [
+            {"index": 1, "name": "server 1", "fx": 200, "fy": 200},
             {"index": 2, "name": "server 2"},
-            {"index": 3, "name": "server 3"},
-            {"index": 4, "name": "server 4"},
-            {"index": 5, "name": "server 5"},
-            {"index": 6, "name": "server 6"},
-            {"index": 7, "name": "server 7"},
-            {"index": 8, "name": "server 8"},
-            {"index": 9, "name": "server 9"}
+            // {"index": 3, "name": "server 3"},
+            // {"index": 4, "name": "server 4"},
+            // {"index": 5, "name": "server 5"},
+            // {"index": 6, "name": "server 6"},
+            // {"index": 7, "name": "server 7"},
+            // {"index": 8, "name": "server 8"},
+            // {"index": 9, "name": "server 9"}
         ];
 
-         this.linkArray = [
-            {source: 1, target: 2},
-            {source: 1, target: 3},
-            {source: 1, target: 4},
-            {source: 2, target: 5},
-            {source: 2, target: 6},
-            {source: 3, target: 7},
-            {source: 5, target: 8},
-            {source: 6, target: 8},
+        this.linkArray = [
+            //{source: 1, target: 2},
+            // {source: 1, target: 3},
+            // {source: 1, target: 4},
+            // {source: 2, target: 5},
+            // {source: 2, target: 6},
+            // {source: 3, target: 7},
+            // {source: 5, target: 8},
+            // {source: 6, target: 8},
         ];
 
         // var nodeArray = [
@@ -89,11 +89,6 @@ export default class Board {
             .attr('width', this.width)
             .attr('height', this.height);
 
-        this.simulation = this.d3.forceSimulation()
-            .force("link", this.d3.forceLink().id(function (d) {
-                return (d.index);
-            }));
-
 
         this.nodeElement = svg.selectAll(".node")
             .data(this.nodeArray);
@@ -101,38 +96,57 @@ export default class Board {
         this.linkElement = svg.selectAll(".link")
             .data(this.linkArray);
 
+        this.simulation = null;
+        // .force("center", this.d3.forceCenter(this.width / 2, this.height / 2))
+
 
         this.update();
     }
-        private update() {
 
-            this.linkElement = this.linkElement.enter()
-                .append("line")
-                .attr("class", "link");
+    private update() {
 
-            this.nodeElement = this.nodeElement.enter()
-                .append("g")
-                .attr("class", "node");
+        this.linkElement = this.linkElement.enter()
+            .append("line")
+            .attr("class", "link");
 
-            this.nodeElement.append("circle")
-                .attr("r", 20);
+        this.nodeElement = this.nodeElement.enter()
+            .append("g")
+            .attr("class", "node");
 
-            this.simulation.nodes(this.nodeArray).on("tick", ticked(this.nodeElement));
-            this.simulation.force("link").links(this.linkArray);
+        this.nodeElement.append("circle")
+            .attr("r", 10);
 
-            function ticked(nodeElement: any){
+        // this.nodeElement.attr("transform", function (d) {
+        //     return ("translate(" + 150 + ", " + 150 + ")");
+        // });
 
-                // MyLogger.log("-------------");
-                // MyLogger.logAllPropertyNames(nodeElement);
 
-                nodeElement.attr("transform", function(d){
-                    return("translate(" + d.x + ", " + d.y + ")");
-                });
-            }
-
+        if (this.simulation == null) {
+            var that = this;
+            this.simulation = this.d3.forceSimulation()
+                .nodes(this.nodeArray)
+                .force("link", this.d3.forceLink().id(d => d.index).links(this.linkArray))
+                .force("charge", this.d3.forceManyBody())
+                .force("center", this.d3.forceCenter(200, 200))
+                .on("tick", function (that) {
+                    that.ticked();
+                }(that));
         }
+    }
 
-    private drawByExample(){
+
+
+    private ticked() {
+
+
+        this.nodeElement.attr("transform", function (d) {
+            return ("translate(" + d.x + ", " + d.y + ")");
+         });
+        
+    }
+
+
+    private drawByExample() {
         var nodes = [
             {"id": 1, "name": "server 1"},
             {"id": 2, "name": "server 2"},
@@ -167,22 +181,27 @@ export default class Board {
             .attr("height", height);
 
         var simulation = this.d3.forceSimulation()
-            .force("link", this.d3.forceLink().id(function(d) { return d.id; }))
+            .force("link", this.d3.forceLink().id(function (d) {
+                return d.id;
+            }))
             .force("charge", this.d3.forceManyBody())
             .force("center", this.d3.forceCenter(width / 2, height / 2));
 
         update();
         function update() {
             link = svg.selectAll(".link")
-                .data(links, function(d) {
-                    return d.target.id; })
+                .data(links, function (d) {
+                    return d.target.id;
+                })
 
             link = link.enter()
                 .append("line")
                 .attr("class", "link");
 
             node = svg.selectAll(".node")
-                .data(nodes, function(d) { return d.id; })
+                .data(nodes, function (d) {
+                    return d.id;
+                })
 
             node = node.enter()
                 .append("g")
@@ -194,11 +213,15 @@ export default class Board {
                 .attr("r", 2.5)
 
             node.append("title")
-                .text(function(d) { return d.id; });
+                .text(function (d) {
+                    return d.id;
+                });
 
             node.append("text")
                 .attr("dy", 3)
-                .text(function(d) { return d.name; });
+                .text(function (d) {
+                    return d.name;
+                });
 
             simulation
                 .nodes(nodes)
@@ -220,10 +243,18 @@ export default class Board {
 
         function ticked() {
             link
-                .attr("x1", function(d) { return d.source.x; })
-                .attr("y1", function(d) { return d.source.y; })
-                .attr("x2", function(d) { return d.target.x; })
-                .attr("y2", function(d) { return d.target.y; });
+                .attr("x1", function (d) {
+                    return d.source.x;
+                })
+                .attr("y1", function (d) {
+                    return d.source.y;
+                })
+                .attr("x2", function (d) {
+                    return d.target.x;
+                })
+                .attr("y2", function (d) {
+                    return d.target.y;
+                });
 
             node.exit().attr("testAttribute", "tick");
             MyLogger.log("ticked");
@@ -256,5 +287,3 @@ export default class Board {
     }
 
 }
-
-
