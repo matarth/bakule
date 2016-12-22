@@ -14,13 +14,38 @@ class D3Div extends React.Component{
     }
 
     componentDidMount(){
-        this.setState({d3: node});
+        this.setState({d3: node['node']});
+
+        this.timer = setInterval(function(d){
+            console.log("React timer");
+            this.setState({d3: node['updateFunction']()});
+        }.bind(this), 1);
+    }
+
+    componentWillUnmount(){
+       clearInterval(this.timer);
+    }
+
+    tick(){
+        var xyz = node['updateFunction']();
+
+        this.setState({d3: xyz});
     }
 
     render(){
+
         return(
                 <RD3Component data={this.state.d3} />
         );
+    }
+
+    checkNode(){
+
+        console.log("checkNode START -----------");
+
+        console.log("checkNode STOP -----------");
+
+
     }
 }
 
@@ -28,6 +53,10 @@ class App extends Component {
 
 
     render() {
+
+        console.log("REACT APP render() started");
+
+
         return (
             <div className="App">
                 <div className="App-header">
@@ -40,7 +69,11 @@ class App extends Component {
                 <D3Div />
             </div>
         );
+
+        console.log("REACT APP render() ended");
+
     }
+
 
 
 }

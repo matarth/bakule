@@ -4,6 +4,14 @@ import Controller from "./ClassesJs/Controller/Controller";
 var node = document.createElement('div');
 var controller = new Controller(d3, node);
 
+var getNode = function() {
+    console.log("XX - " + node['children'][0]['children'][24]['attributes'][1]['value']);
+
+
+    controller.updateBoard();
+    return(node);
+}
+
 
 
 // var svg = d3.select(node).append("svg")
@@ -38,4 +46,4 @@ var controller = new Controller(d3, node);
 //
 
 
-module.exports = node;
+module.exports = {"node": node, "updateFunction": getNode};

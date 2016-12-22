@@ -2,35 +2,47 @@
  * Created by mata on 4.12.16.
  */
 import MyLogger from "./Logger";
-import MapNode from "./Model/MapNode";
+import Node from "./Model/Node";
+import DataStorage from './Model/DataStorage';
+import Link from "./Model/Link";
+import NodeFactory from "./Factories/NodeFactory";
 
     export default class DataReceiver {
 
-        data: Object;
-        rootNode: MapNode = new MapNode();
-        
+        private data: Object;
+        private nodeSet: Set<Node> = new Set<Node>();
+
+        private dataStorage: DataStorage;
+
         constructor() {
             MyLogger.log("DataReceiver constructor");
 
-            var json = require('../../data/node.json');
+            this.dataStorage = new DataStorage();
+            this.getData();
+            this.populateDataStorage();
+        }
 
+        private getData(){
+            var json = require('../../data/mongo_export.json');
             var data = JSON.parse(JSON.stringify(json));
 
-            
             this.data = data;
-            this.jsonToNode(data);
+        }
+
+        private populateDataStorage(){
+            var ii :number = 1;
+
+            MyLogger.logAllProperties(this.data);
+
+
+            for(ii = 1; ii <= 3; ii++) {
+                this.jsonToNode(this.data["node" + ii]); //TODO jinej nazev
+            }
         }
 
 
-        public getData(){
-            return(this.data);
-        }
 
-        public getRootNode(){
-            return(this.rootNode);
-        }
-
-        validateNode(node: any){
+        private validateNode(node: any){
 
             var ret: boolean = true;
 
@@ -54,45 +66,48 @@ import MapNode from "./Model/MapNode";
 
         }
 
-        jsonToNode(data: any){
-            MyLogger.log(this.validateNode(data).toString());
+        private jsonToNode(data: any){
+
+            var node :Node;
+            var source :Node;
+            var uri: string;
+            var id: number;
+            var ii, jj, nodeId:number;
+
+
+            //MyLogger.log(this.validateNode(data).toString());
             MyLogger.log(data['uri']);
             MyLogger.log(data['_id']['$oid']);
             MyLogger.log(data['forms'][0]['action']);
             MyLogger.log(data['linkGroups'][0]['links'][0]['location']);
             MyLogger.log(data['linkGroups'][0]['links'][1]['location']);
+            MyLogger.log(data['linkGroups'].length);
+            MyLogger.logAllPropertyNames(data['linkGroups'][0]['links'][0]);
 
-            this.rootNode['url'] = data['uri'];
+            uri = data['uri'];
+            id = data['_id']['$oid'];
 
-            var childNode1: MapNode = new MapNode();
-            childNode1['url'] = data['forms'][0]['action'];
+            source = NodeFactory.createNode(id, uri);
 
+            this.dataStorage.addNode(source);
 
-            var childNode2: MapNode = new MapNode();
-            childNode2['url'] = data['linkGroups'][0]['links'][0]['location'];
+            nodeId = id;
 
-            var childNode3: MapNode = new MapNode();
-            childNode3['url'] = data['linkGroups'][0]['links'][1]['location'];
-            
-
-            this.rootNode.addChild(childNode1);
-            this.rootNode.addChild(childNode2);
-            this.rootNode.addChild(childNode3);
-
-            this.printNodeStructure(data['forms'][0]);
-
-
-        }
-
-        private printNodeStructure(data: any){
-            var ii: number = 0;
-
-            for(var item in data){
-                MyLogger.log(ii++ + " - " + item);
+            for(ii = 0; ii < data['linkGroups'].length; ii++){
+                for(jj = 0; jj < data['linkGroups'][ii]['links'].length; jj++) {
+                    node = NodeFactory.createNode(++nodeId,data['linkGroups'][ii]['links'][jj]['location']);
+                    node = this.dataStorage.addNode(node);
+                    this.dataStorage.addLink(new Link(source, node));
+                }
             }
+
         }
-        
         getNodeById(id: number){
             // TODO
         }
+
+        public getDataStorage(){
+            return(this.dataStorage);
+        }
     }
+

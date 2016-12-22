@@ -7,8 +7,10 @@ import Node from './Node';
 
 export default class Link{
 
-    public source: number;
-    public target: number;
+    private source: number;
+    private target: number;
+
+    private linkData: any;
 
 
     constructor(source: Node, target: Node){
@@ -17,6 +19,15 @@ export default class Link{
         this.source = source.getIndex();
         this.target = target.getIndex();
 
+    }
+
+    public setLinkData(type :LinkTypeEnum, linkGroupNumber :number){
+        if(linkGroupNumber != null){
+            this.linkData = {"type": type, "linkGroup": linkGroupNumber};
+        }
+        else{
+            this.linkData = {"type": type, "linkGroup": -1};
+        }
     }
 
     public setSourceNodeIndex(sourceId: number){
